@@ -1,0 +1,16 @@
+[
+  {
+    "name": "one_series.csv",
+    "file": "examples/one_series.csv",
+    "title": "One beat",
+    "points": 140,
+    "note": "140 points - exactly what the model takes in one go."
+  },
+  {
+    "name": "long_series.csv",
+    "file": "examples/long_series.csv",
+    "title": "4 beats in a row",
+    "points": 560,
+    "note": "560 points - the app cuts it into 4 windows of 140 and predicts each one."
+  }
+]

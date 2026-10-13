@@ -1,0 +1,23 @@
+# pushes the app to a free Hugging Face Space. started by hand (Actions tab -> Run workflow),
+# so a half-finished commit never goes live by accident.
+#
+# one-time setup in the GitHub repo -> Settings -> Secrets and variables -> Actions:
+#   secret   HF_TOKEN  = a Hugging Face token with "write" access
+#   variable HF_SPACE  = <your-hf-username>/seanet-studio
+name: Deploy to Hugging Face
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install "huggingface_hub>=0.25"
+      - run: python deploy/huggingface/push_to_space.py --space "${{ vars.HF_SPACE }}"
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}

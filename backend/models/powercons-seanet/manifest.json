@@ -1,0 +1,46 @@
+{
+  "id": "powercons-seanet",
+  "name": "SEA-Net · Home electricity",
+  "order": 4,
+  "version": "1.0.0",
+  "task": "time_series_classification",
+  "outputs": ["class_probabilities", "timestep_attribution"],
+  "files": {
+    "onnx": "model.onnx",
+    "export_info": "export_info.json",
+    "samples": "samples.json",
+    "examples": "examples.json"
+  },
+  "domain": {
+    "key": "power",
+    "template": "energy",
+    "item": {"one": "day", "many": "days"},
+    "short": "Home electricity",
+    "icon": "plug",
+    "title": "Home electricity use",
+    "summary": "One day of electricity use in a home, measured every 10 minutes (144 values). The model says if the day looks like a warm-season day or a cold-season day, and marks the hours that made it decide - for example heating in the evening.",
+    "signal_name": "Power",
+    "unit": "kW",
+    "sampling_interval_minutes": 10,
+    "time_origin": "midnight",
+    "accent": "#059669",
+    "data_note": "The examples come from the PowerCons test set (UCR archive): one household's electricity use over a year, split into days. Warm season = April to September, cold season = October to March. The model never saw them while training. The dataset does not say at what time a day starts. The average day is lowest at 02:00-06:00 and highest at 20:00-22:00, which fits a day that starts at midnight, so the clock times shown assume that."
+  },
+  "classes": [
+    {"id": 0, "key": "warm", "label": "Warm season", "kind": "category", "color": "#f59e0b", "icon": "sun",
+     "description": "The day looks like one from April to September: less heating, lower use in the evening."},
+    {"id": 1, "key": "cold", "label": "Cold season", "kind": "category", "color": "#3b82f6", "icon": "snowflake",
+     "description": "The day looks like one from October to March: more heating and lighting, higher use in the evening."}
+  ],
+  "model_card": {
+    "architecture": "The same SEA-Net design as the other domains (sea_mstcn_sep_bottleneck + sea_topk_conjunctive), trained only on PowerCons.",
+    "how_it_explains": "The model gives every 10-minute step a score for each class. The final score of a class is the average of its strongest 10% of steps. Those per-step scores are what you see shaded on the chart.",
+    "baseline": "",
+    "limitations": [
+      "Trained on ONE household. Other homes use power in other ways.",
+      "It only knows two groups (warm / cold season) - it does not find faults.",
+      "The test set is small (180 days), so the accuracy number can move a few points with other data.",
+      "Several days in a row are cut into 144-value windows, one per day if the file starts at midnight."
+    ]
+  }
+}

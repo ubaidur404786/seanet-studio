@@ -1,0 +1,11 @@
+**/node_modules
+**/dist
+**/__pycache__
+**/.pytest_cache
+.git
+.github
+.env
+*.md
+!frontend/**/*.md
+model_export
+backend/tests

@@ -1,0 +1,7 @@
+# only for the ONE-OFF export (model_export/*.py). the backend does not need any of this.
+# install pytorch first from https://pytorch.org (the cpu build is enough), then:
+onnx>=1.16
+onnxruntime>=1.18
+numpy
+pandas
+pyyaml

@@ -1,0 +1,122 @@
+{
+  "exported": "2026-10-13 12:08:27",
+  "source_bundle": "results/top_results/SEA_NET/top_bottleneck_topk__sea_mstcn_sep_bottleneck__sea_topk_conjunctive/deploy/WebTraffic__seed0.pt",
+  "model_id": "top_bottleneck_topk__sea_mstcn_sep_bottleneck__sea_topk_conjunctive",
+  "dataset": "WebTraffic",
+  "seed": 0,
+  "encoder": {
+    "type": "sea_mstcn_sep_bottleneck",
+    "d": 64,
+    "n_blocks": 4,
+    "dropout": 0.2,
+    "max_dilation": 16,
+    "kernels": [
+      5,
+      11,
+      23
+    ],
+    "bottleneck_ratio": 4
+  },
+  "pooling": {
+    "type": "sea_topk_conjunctive",
+    "d_attn": 8,
+    "dropout": 0.2,
+    "positional_encoding": true,
+    "top_frac": 0.1
+  },
+  "input_length": 1008,
+  "n_channels": 1,
+  "n_classes": 10,
+  "params": 41324,
+  "metrics": {
+    "test_acc": 0.942,
+    "test_loss": 0.2943,
+    "test_aopcr": 2.951,
+    "test_ndcg": 0.7863,
+    "params": 41324,
+    "model_size_mb": 1.4279
+  },
+  "trained_with": {
+    "torch": "2.0.1+cu118",
+    "python": "3.10.20",
+    "platform": "Linux-6.12.101+deb13-amd64-x86_64-with-glibc2.41"
+  },
+  "trained_git_commit": "c79ef6e9edcb9b9b4eadb71853095e0bc46c7a10",
+  "onnx": {
+    "file": "model.onnx",
+    "opset": 17,
+    "size_kb": 1437.6,
+    "max_abs_diff_logits": 3.814697265625e-06,
+    "max_abs_diff_interpretation": 9.5367431640625e-06,
+    "torch_version": "2.5.1+cu121"
+  },
+  "test_check": {
+    "what": "full test split run through model.onnx with the app's own preprocessing",
+    "n": 500,
+    "accuracy": 0.942,
+    "balanced_accuracy": 0.942,
+    "per_class": [
+      {
+        "class_id": 0,
+        "n": 50,
+        "right": 50,
+        "accuracy": 1.0
+      },
+      {
+        "class_id": 1,
+        "n": 50,
+        "right": 50,
+        "accuracy": 1.0
+      },
+      {
+        "class_id": 2,
+        "n": 50,
+        "right": 43,
+        "accuracy": 0.86
+      },
+      {
+        "class_id": 3,
+        "n": 50,
+        "right": 48,
+        "accuracy": 0.96
+      },
+      {
+        "class_id": 4,
+        "n": 50,
+        "right": 50,
+        "accuracy": 1.0
+      },
+      {
+        "class_id": 5,
+        "n": 50,
+        "right": 49,
+        "accuracy": 0.98
+      },
+      {
+        "class_id": 6,
+        "n": 50,
+        "right": 50,
+        "accuracy": 1.0
+      },
+      {
+        "class_id": 7,
+        "n": 50,
+        "right": 40,
+        "accuracy": 0.8
+      },
+      {
+        "class_id": 8,
+        "n": 50,
+        "right": 43,
+        "accuracy": 0.86
+      },
+      {
+        "class_id": 9,
+        "n": 50,
+        "right": 48,
+        "accuracy": 0.96
+      }
+    ],
+    "matches_training": true
+  }
+}

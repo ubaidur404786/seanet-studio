@@ -1,0 +1,61 @@
+{
+  "id": "webtraffic-seanet",
+  "name": "SEA-Net · Web traffic",
+  "order": 1,
+  "version": "1.2.0",
+  "task": "time_series_classification",
+  "outputs": ["class_probabilities", "timestep_attribution"],
+  "files": {
+    "onnx": "model.onnx",
+    "export_info": "export_info.json",
+    "samples": "samples.json",
+    "examples": "examples.json"
+  },
+  "domain": {
+    "key": "web_traffic",
+    "template": "monitoring",
+    "item": {"one": "week", "many": "weeks"},
+    "short": "Website traffic",
+    "icon": "globe",
+    "title": "Website traffic",
+    "summary": "One week of visits to a website, counted every 10 minutes (1,008 values). The model says if the week looks normal or which kind of problem it has, and marks the moments that made it decide.",
+    "signal_name": "Visits",
+    "unit": "visits / 10 min",
+    "sampling_interval_minutes": 10,
+    "time_origin": "start of the week",
+    "accent": "#0284c7",
+    "data_note": "The examples come from the WebTraffic test set (Early et al., ICLR 2024): made-up but realistic weekly traffic with one known problem added at a known place. The model never saw them while training."
+  },
+  "classes": [
+    {"id": 0, "key": "none",    "label": "Normal",          "kind": "normal",  "color": "#22c55e",
+     "description": "A normal week: busy days, quiet nights and a weekly rhythm, with nothing odd added."},
+    {"id": 1, "key": "spikes",  "label": "Spikes",          "kind": "anomaly", "color": "#ef4444",
+     "description": "Single values that jump far up or down and come straight back, like a glitch in the counter."},
+    {"id": 2, "key": "flip",    "label": "Flipped part",    "kind": "anomaly", "color": "#f97316",
+     "description": "A part of 6 hours to 2 days is played backwards, so the daily pattern runs the wrong way."},
+    {"id": 3, "key": "skew",    "label": "Time skew",       "kind": "anomaly", "color": "#f59e0b",
+     "description": "A part where time is squeezed on one side and stretched on the other, so the daily curve looks lopsided."},
+    {"id": 4, "key": "noise",   "label": "Extra noise",     "kind": "anomaly", "color": "#a855f7",
+     "description": "A part with much more random jitter than usual, for example from a broken sensor or logging problem."},
+    {"id": 5, "key": "cutoff",  "label": "Outage",          "kind": "anomaly", "color": "#dc2626",
+     "description": "Traffic suddenly falls to almost zero for a while, as if the site or the tracking went down."},
+    {"id": 6, "key": "average", "label": "Too smooth",      "kind": "anomaly", "color": "#06b6d4",
+     "description": "A part that is too smooth - the usual small wiggles are gone, which can mean the data was filled in or estimated."},
+    {"id": 7, "key": "wander",  "label": "Drift",           "kind": "anomaly", "color": "#8b5cf6",
+     "description": "Traffic slowly moves away from its normal level over a while, then jumps back."},
+    {"id": 8, "key": "peak",    "label": "Traffic peak",    "kind": "anomaly", "color": "#e11d48",
+     "description": "A smooth bump of extra traffic on top of the normal pattern, like a campaign or a post going viral."},
+    {"id": 9, "key": "trough",  "label": "Traffic dip",     "kind": "anomaly", "color": "#2563eb",
+     "description": "A smooth dip where traffic is lower than it should be, like a partial outage or lost links."}
+  ],
+  "model_card": {
+    "architecture": "SEA-Net: a small convolution network that looks at short, medium and long patterns (sea_mstcn_sep_bottleneck), plus a Top-k Conjunctive head (sea_topk_conjunctive).",
+    "how_it_explains": "The model gives every single time step a score for every class. The final score of a class is the average of its strongest 10% of time steps. Those per-step scores are what you see shaded on the chart - they are how the model decides, not something added afterwards.",
+    "baseline": "MILLET (Early et al., ICLR 2024) trained on the same data: 91.6% test accuracy with 424K weights. MILLET does better on the deletion test (AOPCR); SEA-Net's evidence lands closer to the real problem (NDCG).",
+    "limitations": [
+      "Trained only on made-up web-traffic weeks of 1,008 values. Real traffic that looks very different can get a confident but wrong answer.",
+      "Series shorter than 1,008 values are stretched first, which can blur very short events. Longer ones are cut into windows.",
+      "Each window is assumed to have at most one kind of problem."
+    ]
+  }
+}

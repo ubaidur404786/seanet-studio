@@ -1,0 +1,92 @@
+{
+  "exported": "2026-10-13 15:11:49",
+  "source_bundle": "results/top_results/SEA_NET/top_bottleneck_topk__sea_mstcn_sep_bottleneck__sea_topk_conjunctive/deploy/ECG5000__seed0.pt",
+  "model_id": "top_bottleneck_topk__sea_mstcn_sep_bottleneck__sea_topk_conjunctive",
+  "dataset": "ECG5000",
+  "seed": 0,
+  "encoder": {
+    "type": "sea_mstcn_sep_bottleneck",
+    "d": 64,
+    "n_blocks": 4,
+    "dropout": 0.2,
+    "max_dilation": 16,
+    "kernels": [
+      5,
+      11,
+      23
+    ],
+    "bottleneck_ratio": 4
+  },
+  "pooling": {
+    "type": "sea_topk_conjunctive",
+    "d_attn": 8,
+    "dropout": 0.2,
+    "positional_encoding": true,
+    "top_frac": 0.1
+  },
+  "input_length": 140,
+  "n_channels": 1,
+  "n_classes": 5,
+  "params": 40954,
+  "metrics": {
+    "test_acc": 0.9438,
+    "test_loss": 0.2538,
+    "test_aopcr": 1.991,
+    "test_ndcg": null,
+    "params": 40954,
+    "model_size_mb": 1.4269
+  },
+  "trained_with": {
+    "torch": "2.5.1+cu121",
+    "python": "3.12.4",
+    "platform": "Windows-11-10.0.26300-SP0"
+  },
+  "trained_git_commit": "9b48b6d10a9fef2ff3f4ff35d5baf5f1213f133e",
+  "onnx": {
+    "file": "model.onnx",
+    "opset": 17,
+    "size_kb": 1436.2,
+    "max_abs_diff_logits": 4.76837158203125e-07,
+    "max_abs_diff_interpretation": 2.384185791015625e-06,
+    "torch_version": "2.5.1+cu121"
+  },
+  "test_check": {
+    "what": "full test split run through model.onnx with the app's own preprocessing",
+    "n": 4500,
+    "accuracy": 0.9438,
+    "balanced_accuracy": 0.5615,
+    "per_class": [
+      {
+        "class_id": 0,
+        "n": 2627,
+        "right": 2625,
+        "accuracy": 0.9992
+      },
+      {
+        "class_id": 1,
+        "n": 1590,
+        "right": 1512,
+        "accuracy": 0.9509
+      },
+      {
+        "class_id": 2,
+        "n": 86,
+        "right": 32,
+        "accuracy": 0.3721
+      },
+      {
+        "class_id": 3,
+        "n": 175,
+        "right": 77,
+        "accuracy": 0.44
+      },
+      {
+        "class_id": 4,
+        "n": 22,
+        "right": 1,
+        "accuracy": 0.0455
+      }
+    ],
+    "matches_training": true
+  }
+}

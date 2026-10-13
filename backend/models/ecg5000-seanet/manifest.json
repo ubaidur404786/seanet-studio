@@ -1,0 +1,53 @@
+{
+  "id": "ecg5000-seanet",
+  "name": "SEA-Net · Heartbeats (ECG)",
+  "order": 2,
+  "version": "1.0.0",
+  "task": "time_series_classification",
+  "outputs": ["class_probabilities", "timestep_attribution"],
+  "files": {
+    "onnx": "model.onnx",
+    "export_info": "export_info.json",
+    "samples": "samples.json",
+    "examples": "examples.json"
+  },
+  "domain": {
+    "key": "ecg",
+    "template": "clinical",
+    "item": {"one": "beat", "many": "beats"},
+    "short": "Heartbeats (ECG)",
+    "icon": "heart",
+    "title": "Heartbeat check (ECG)",
+    "summary": "One heartbeat from an ECG recording, cut out and stretched to 140 values. The model says if the beat looks normal or which kind of irregular beat it is, and marks the part of the beat that made it decide.",
+    "signal_name": "ECG",
+    "unit": "scaled amplitude",
+    "sampling_interval_minutes": null,
+    "time_origin": "start of the beat",
+    "accent": "#e11d48",
+    "warning": "Demo only. This is not a medical device. Never use it to make decisions about anyone's health.",
+    "data_note": "The examples come from the ECG5000 test set (UCR archive): 5,000 beats from a 20-hour ECG of one patient with severe heart failure (PhysioNet, BIDMC chf07), labelled automatically. The model never saw them while training. There is no ground truth for WHERE in the beat the problem is, so only the model's own evidence is shown."
+  },
+  "classes": [
+    {"id": 0, "key": "normal",     "label": "Normal beat",        "kind": "normal",  "color": "#16a34a",
+     "description": "A normal heartbeat."},
+    {"id": 1, "key": "r_on_t_pvc", "label": "R-on-T early beat",  "kind": "anomaly", "color": "#dc2626",
+     "description": "An extra early beat from the lower heart chambers that lands on the end of the previous beat (R-on-T PVC). Doctors watch for it because it can start dangerous rhythms."},
+    {"id": 2, "key": "pvc",        "label": "Early beat (PVC)",   "kind": "anomaly", "color": "#f97316",
+     "description": "An extra, early beat that starts in the lower heart chambers instead of the normal starting point (premature ventricular contraction)."},
+    {"id": 3, "key": "sp_eb",      "label": "Upper early beat",   "kind": "anomaly", "color": "#a855f7",
+     "description": "An early or out-of-place beat that starts above the lower heart chambers (supraventricular premature or ectopic beat)."},
+    {"id": 4, "key": "unclassified","label": "Unclassified beat", "kind": "anomaly", "color": "#64748b",
+     "description": "A beat the automatic labelling could not put in one of the other groups."}
+  ],
+  "model_card": {
+    "architecture": "The same SEA-Net design as the other domains (sea_mstcn_sep_bottleneck + sea_topk_conjunctive), trained only on ECG5000.",
+    "how_it_explains": "The model gives every point of the beat a score for every class. The final score of a class is the average of its strongest 10% of points. Those per-point scores are what you see shaded on the chart.",
+    "baseline": "MILLET (Early et al., ICLR 2024), published result on ECG5000: 94.2% test accuracy.",
+    "limitations": [
+      "This is a demo, NOT a medical device. Never use it to make decisions about a person's health.",
+      "All beats come from ONE patient with severe heart failure, labelled by a program, not checked one by one by a doctor.",
+      "The overall accuracy looks high because most beats are normal. On the three rare beat types (PVC, upper early, unclassified) the model is wrong more often than right - see the per-class table.",
+      "Input must be one beat. Longer recordings are cut into 140-value windows, which will not line up with real beats."
+    ]
+  }
+}

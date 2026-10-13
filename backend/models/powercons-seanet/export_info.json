@@ -1,0 +1,74 @@
+{
+  "exported": "2026-10-13 15:12:15",
+  "source_bundle": "results/top_results/SEA_NET/top_bottleneck_topk__sea_mstcn_sep_bottleneck__sea_topk_conjunctive/deploy/PowerCons__seed0.pt",
+  "model_id": "top_bottleneck_topk__sea_mstcn_sep_bottleneck__sea_topk_conjunctive",
+  "dataset": "PowerCons",
+  "seed": 0,
+  "encoder": {
+    "type": "sea_mstcn_sep_bottleneck",
+    "d": 64,
+    "n_blocks": 4,
+    "dropout": 0.2,
+    "max_dilation": 16,
+    "kernels": [
+      5,
+      11,
+      23
+    ],
+    "bottleneck_ratio": 4
+  },
+  "pooling": {
+    "type": "sea_topk_conjunctive",
+    "d_attn": 8,
+    "dropout": 0.2,
+    "positional_encoding": true,
+    "top_frac": 0.1
+  },
+  "input_length": 144,
+  "n_channels": 1,
+  "n_classes": 2,
+  "params": 40732,
+  "metrics": {
+    "test_acc": 0.9389,
+    "test_loss": 0.1574,
+    "test_aopcr": 1.8677,
+    "test_ndcg": null,
+    "params": 40732,
+    "model_size_mb": 1.4261
+  },
+  "trained_with": {
+    "torch": "2.5.1+cu121",
+    "python": "3.12.4",
+    "platform": "Windows-11-10.0.26300-SP0"
+  },
+  "trained_git_commit": "9b48b6d10a9fef2ff3f4ff35d5baf5f1213f133e",
+  "onnx": {
+    "file": "model.onnx",
+    "opset": 17,
+    "size_kb": 1435.3,
+    "max_abs_diff_logits": 4.76837158203125e-07,
+    "max_abs_diff_interpretation": 1.9073486328125e-06,
+    "torch_version": "2.5.1+cu121"
+  },
+  "test_check": {
+    "what": "full test split run through model.onnx with the app's own preprocessing",
+    "n": 180,
+    "accuracy": 0.9389,
+    "balanced_accuracy": 0.9389,
+    "per_class": [
+      {
+        "class_id": 0,
+        "n": 90,
+        "right": 86,
+        "accuracy": 0.9556
+      },
+      {
+        "class_id": 1,
+        "n": 90,
+        "right": 83,
+        "accuracy": 0.9222
+      }
+    ],
+    "matches_training": true
+  }
+}

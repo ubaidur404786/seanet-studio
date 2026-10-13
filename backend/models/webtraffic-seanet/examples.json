@@ -1,0 +1,16 @@
+[
+  {
+    "name": "one_series.csv",
+    "file": "examples/one_series.csv",
+    "title": "One week",
+    "points": 1008,
+    "note": "1,008 points - exactly what the model takes in one go."
+  },
+  {
+    "name": "long_series.csv",
+    "file": "examples/long_series.csv",
+    "title": "4 weeks in a row",
+    "points": 4032,
+    "note": "4,032 points - the app cuts it into 4 windows of 1,008 and predicts each one."
+  }
+]

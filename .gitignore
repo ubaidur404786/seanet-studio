@@ -1,0 +1,20 @@
+# secrets - the LLM key lives here locally, NEVER commit it
+.env
+
+# python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# node
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+# editors / os
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

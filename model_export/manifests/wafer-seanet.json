@@ -1,0 +1,45 @@
+{
+  "id": "wafer-seanet",
+  "name": "SEA-Net · Chip factory sensor",
+  "order": 3,
+  "version": "1.0.0",
+  "task": "time_series_classification",
+  "outputs": ["class_probabilities", "timestep_attribution"],
+  "files": {
+    "onnx": "model.onnx",
+    "export_info": "export_info.json",
+    "samples": "samples.json",
+    "examples": "examples.json"
+  },
+  "domain": {
+    "key": "wafer",
+    "template": "industrial",
+    "item": {"one": "run", "many": "runs"},
+    "short": "Chip factory",
+    "icon": "factory",
+    "title": "Chip factory quality check",
+    "summary": "The reading of one sensor while a machine processes one silicon wafer (the disc that computer chips are made from), 152 values. The model says if the process ran normally or went wrong, and marks the moments that made it decide.",
+    "signal_name": "Sensor reading",
+    "unit": "scaled units",
+    "sampling_interval_minutes": null,
+    "time_origin": "start of the process",
+    "accent": "#d97706",
+    "data_note": "The examples come from the Wafer test set (UCR archive, R. Olszewski): real in-line sensor readings from semiconductor production. About 1 in 9 runs is abnormal. The model never saw them while training. There is no ground truth for WHERE the problem is, so only the model's own evidence is shown."
+  },
+  "classes": [
+    {"id": 0, "key": "abnormal", "label": "Abnormal run", "kind": "anomaly", "color": "#dc2626",
+     "description": "The sensor reading does not look like a good run - something in the process probably went wrong for this wafer."},
+    {"id": 1, "key": "normal",   "label": "Normal run",   "kind": "normal",  "color": "#16a34a",
+     "description": "The sensor reading looks like a good, normal run."}
+  ],
+  "model_card": {
+    "architecture": "The same SEA-Net design as the other domains (sea_mstcn_sep_bottleneck + sea_topk_conjunctive), trained only on Wafer.",
+    "how_it_explains": "The model gives every time step a score for each class. The final score of a class is the average of its strongest 10% of time steps. Those per-step scores are what you see shaded on the chart.",
+    "baseline": "MILLET (Early et al., ICLR 2024), published result on Wafer: 99.8% test accuracy.",
+    "limitations": [
+      "Trained on one sensor from one production line. Other machines or sensors will need their own model.",
+      "Abnormal runs are rare in the data, so a 'normal' answer is right most of the time even by luck - look at the per-class table and the confidence.",
+      "Longer recordings are cut into 152-value windows, which may not line up with real process runs."
+    ]
+  }
+}

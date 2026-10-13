@@ -1,0 +1,8 @@
+SEA-Net Studio
+
+The demo series in backend/models/webtraffic-seanet/samples.json come from the WebTraffic
+dataset of MILTimeSeriesClassification (Apache License 2.0):
+https://github.com/JAEarly/MILTimeSeriesClassification
+
+MILTimeSeriesClassification
+Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
