@@ -1,9 +1,17 @@
-// tiny wrapper around fetch. every call goes to /api, which is the same server in production
-// and is forwarded to :8000 by vite during development (see vite.config.ts)
+// tiny wrapper around fetch. every call goes to <API_URL>/api
+//   - local dev and Docker: API_URL is empty, so it is the same server ("/api"). during
+//     `npm run dev` vite forwards /api to :8000 (see vite.config.ts)
+//   - GitHub Pages: the page and the api live on different hosts, so the build is made with
+//     VITE_API_URL=https://<hf-user>-seanet-studio.hf.space (see .github/workflows/deploy.yml)
 import type { Explanation, ModelCard, PredictResult, Sample, SampleRef, StepInfo } from "./types";
 
+// vite puts VITE_* variables into the code at build time. remove a "/" at the end so we never get "//api"
+const API_URL: string = (import.meta.env.VITE_API_URL ?? "").replace(/\/+$/, "");
+
+export const apiDocsUrl = `${API_URL}/api/docs`;
+
 async function call<T>(path: string, body?: unknown): Promise<T> {
-  const res = await fetch(`/api${path}`, {
+  const res = await fetch(`${API_URL}/api${path}`, {
     method: body === undefined ? "GET" : "POST",
     headers: body === undefined ? undefined : { "Content-Type": "application/json" },
     body: body === undefined ? undefined : JSON.stringify(body),
@@ -23,7 +31,7 @@ async function call<T>(path: string, body?: unknown): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-export const exampleUrl = (modelId: string, name: string) => `/api/models/${modelId}/examples/${name}`;
+export const exampleUrl = (modelId: string, name: string) => `${API_URL}/api/models/${modelId}/examples/${name}`;
 
 export const api = {
   models: () => call<ModelCard[]>("/models"),

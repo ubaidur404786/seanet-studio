@@ -11,7 +11,8 @@ moments that made it decide, and explains the result in plain English.
 ![React](https://img.shields.io/badge/frontend-React%2019-61DAFB)
 ![License](https://img.shields.io/badge/license-Apache--2.0-green)
 
-**Live demo:** _add your Hugging Face Space link here after the first deploy_
+**Live demo:** https://ubaidur404786.github.io/seanet-studio/
+(free hosting: the first visit after a quiet couple of days takes a minute or two while the server wakes up)
 
 ![SEA-Net Studio](docs/screenshot.jpg)
 
@@ -92,7 +93,7 @@ a model for another domain is a new folder, not new frontend code.
 | API | FastAPI, Pydantic, httpx (async LLM calls), GZip, per-visitor rate limit |
 | LLM | any OpenAI-compatible free API: Groq (default, `openai/gpt-oss-120b`), Google Gemini, or a local Ollama |
 | Frontend | React 19, TypeScript, Vite, Tailwind CSS 4, Recharts, responsive + dark mode |
-| Ops | Docker (multi-stage), GitHub Actions CI, Hugging Face Spaces (free hosting) |
+| Ops | Docker (multi-stage), GitHub Actions (CI + deploy), Hugging Face Spaces (backend) + GitHub Pages (frontend), both free |
 
 ## Run it locally
 
@@ -129,16 +130,36 @@ docker build -t seanet-studio .
 docker run -p 7860:7860 -e LLM_API_KEY=your_key seanet-studio   # open http://localhost:7860
 ```
 
-## Deploy for free (Hugging Face Spaces)
+## Deploy for free (GitHub Pages + Hugging Face Spaces)
+
+The product is split over two free hosts:
+
+| Part | Host | What runs there |
+|---|---|---|
+| Frontend | GitHub Pages | the built React files (plain static files) |
+| Backend | Hugging Face Space (Docker, free CPU) | FastAPI + ONNX Runtime + the 4 models. It also serves the app itself, as a backup |
+
+The two are on different hosts, so two settings connect them: the frontend is built with
+`VITE_API_URL` = the Space address, and the Space gets `ALLOWED_ORIGINS` = the Pages address (CORS,
+otherwise the browser blocks the calls). The LLM key is a Space **secret**, it never reaches the browser.
+One workflow, `.github/workflows/deploy.yml`, does everything: backend first, then frontend.
+
+One-time setup:
 
 1. Create a free account at huggingface.co and a **write** token (Settings → Access Tokens).
 2. In this GitHub repo: Settings → Secrets and variables → Actions:
-   secret `HF_TOKEN` = the token, variable `HF_SPACE` = `<your-hf-username>/seanet-studio`.
-3. Actions tab → **Deploy to Hugging Face** → Run workflow. The Space is created and built.
-4. In the Space: Settings → Variables and secrets → add the secret `LLM_API_KEY`
-   (and `LLM_BASE_URL` / `LLM_MODEL` if you do not use Groq).
+   - secret `HF_TOKEN` = the token
+   - secret `LLM_API_KEY` = your free Groq key (optional: without it the app writes template text)
+   - variable `HF_SPACE` = `<your-hf-username>/seanet-studio`
+   - variable `API_URL` = `https://<your-hf-username>-seanet-studio.hf.space`
+3. Settings → Pages → Source: **GitHub Actions**.
+4. Actions tab → **Deploy** → Run workflow (or `gh workflow run deploy.yml`).
 
-Free Spaces sleep after a while without visitors; the first visit then takes ~30 s to wake up.
+The Space needs about 5 minutes to build the first time. If you do not use Groq, also add
+`LLM_BASE_URL` / `LLM_MODEL` as variables in the Space settings.
+
+Free Spaces sleep after 48 hours without visitors. The app then shows "Waking up the free server…"
+and keeps trying by itself for 3 minutes, so the first visitor only has to wait.
 
 ## API
 
@@ -179,7 +200,8 @@ frontend/src/
   components/        Header, Logo, Hero, InputPanel, PipelineBar, ResultLayout, PredictionCard,
                      SeriesChart, EvidenceList, ExplanationCard, HowItWorks
 Dockerfile           node build stage + python runtime stage, one container
-.github/workflows/   CI (tests, build, docker) and manual deploy to Hugging Face
+.github/workflows/   CI (tests, build, docker) and a manual deploy (Hugging Face + GitHub Pages)
+deploy/huggingface/  the script that uploads the backend to the Space + the Space's own README
 ```
 
 ## The models (one per domain)

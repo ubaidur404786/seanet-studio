@@ -4,6 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 // during `npm run dev` the api runs on :8000, so we forward /api calls there.
 // in production the backend serves the built files itself, so no proxy is needed.
+// (GitHub Pages serves the site from /seanet-studio/, so the deploy workflow builds with --base)
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   // recharts alone is ~400 kB, one bundle is fine for a single page app

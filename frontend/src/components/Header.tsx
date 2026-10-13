@@ -1,4 +1,5 @@
 import { Moon, Sun } from "lucide-react";
+import { apiDocsUrl } from "../api";
 import type { ModelCard } from "../types";
 import type { Theme } from "../lib/useTheme";
 import { iconFor } from "../lib/icons";
@@ -17,7 +18,8 @@ export default function Header({ model, theme, onToggleTheme }: Props) {
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200/70 bg-white/80 backdrop-blur dark:border-slate-800/70 dark:bg-navy/80">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6 lg:px-8">
-        <a href="/" className="flex shrink-0 items-center gap-2.5">
+        {/* BASE_URL is "/" normally and "/seanet-studio/" on GitHub Pages */}
+        <a href={import.meta.env.BASE_URL} className="flex shrink-0 items-center gap-2.5">
           <Logo />
           <span className="leading-tight">
             <span className="block font-semibold tracking-tight text-slate-900 dark:text-white">
@@ -43,7 +45,7 @@ export default function Header({ model, theme, onToggleTheme }: Props) {
           <a className="hidden rounded-lg px-3 py-1.5 text-slate-600 hover:bg-slate-100 md:block dark:text-slate-300 dark:hover:bg-slate-800" href="#under-the-hood">
             How it works
           </a>
-          <a className="hidden rounded-lg px-3 py-1.5 text-slate-600 hover:bg-slate-100 md:block dark:text-slate-300 dark:hover:bg-slate-800" href="/api/docs" target="_blank" rel="noreferrer">
+          <a className="hidden rounded-lg px-3 py-1.5 text-slate-600 hover:bg-slate-100 md:block dark:text-slate-300 dark:hover:bg-slate-800" href={apiDocsUrl} target="_blank" rel="noreferrer">
             API
           </a>
           <a className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800" href={REPO_URL} target="_blank" rel="noreferrer" aria-label="Source code on GitHub">

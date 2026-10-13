@@ -9,6 +9,7 @@
 // the look follows the chosen domain: its manifest names a template (lib/templates.ts), we put
 // data-template="..." on the page for the css part and pass the layout + chart style down.
 import { useCallback, useEffect, useRef, useState } from "react";
+import { LoaderCircle } from "lucide-react";
 import { api } from "./api";
 import type { Explanation, ModelCard, PredictResult, SampleRef, SeriesInput } from "./types";
 import { useTheme } from "./lib/useTheme";
@@ -29,6 +30,8 @@ import HowItWorks from "./components/HowItWorks";
 import EmptyState from "./components/EmptyState";
 import Footer from "./components/Footer";
 
+const TRIES = 36; // 36 tries x 5 s = 3 minutes
+
 export default function App() {
   const { theme, toggleTheme } = useTheme();
   const pipe = usePipeline();
@@ -36,6 +39,7 @@ export default function App() {
   const [model, setModel] = useState<ModelCard | null>(null);
   const [samples, setSamples] = useState<SampleRef[]>([]);
   const [bootError, setBootError] = useState<string | null>(null);
+  const [waking, setWaking] = useState(false); // true after the first failed try = server is asleep
 
   const [input, setInput] = useState<SeriesInput | null>(null);
   const [result, setResult] = useState<PredictResult | null>(null);
@@ -49,15 +53,34 @@ export default function App() {
   // its own counter: clicking two windows fast must not show the first window's text last
   const explainSeq = useRef(0);
 
-  // load the model list once
+  // load the model list once. the free server (Hugging Face) sleeps after 2 days without
+  // visitors and needs a minute or two to wake up, so we keep trying every 5 s for ~3 minutes
+  // instead of showing an error straight away
   useEffect(() => {
-    api
-      .models()
-      .then((list) => {
-        setModels(list);
-        setModel(list[0] ?? null);
-      })
-      .catch((e: Error) => setBootError(e.message));
+    let alive = true;
+    const load = async () => {
+      for (let attempt = 1; attempt <= TRIES; attempt++) {
+        try {
+          const list = await api.models();
+          if (!alive) return;
+          setModels(list);
+          setModel(list[0] ?? null);
+          return;
+        } catch (e) {
+          if (!alive) return;
+          if (attempt === TRIES) {
+            setBootError((e as Error).message);
+            return;
+          }
+          setWaking(true);
+          await new Promise((r) => setTimeout(r, 5000));
+        }
+      }
+    };
+    void load();
+    return () => {
+      alive = false;
+    };
   }, []);
 
   // a new domain was picked. the old result is cleared in the SAME click: if it waited for the
@@ -156,7 +179,9 @@ export default function App() {
         <div className="card max-w-md p-6 text-center">
           <p className="font-semibold">Could not reach the server</p>
           <p className="mt-2 text-sm text-slate-500">{bootError}</p>
-          <p className="mt-4 text-xs text-slate-400">The free server goes to sleep when nobody uses it. Wait a few seconds and refresh.</p>
+          <p className="mt-4 text-xs text-slate-400">
+            We kept trying for 3 minutes. The free server may be restarting - please refresh the page in a little while.
+          </p>
         </div>
       </div>
     );
@@ -231,7 +256,20 @@ export default function App() {
           <HowItWorks model={model} result={shown} />
         </>
       ) : (
-        <div className="grid min-h-[60vh] place-items-center text-sm text-slate-500">Loading the model…</div>
+        <div className="grid min-h-[60vh] place-items-center p-6 text-center text-sm text-slate-500" aria-live="polite">
+          {waking ? (
+            <div className="max-w-sm">
+              <LoaderCircle className="mx-auto h-6 w-6 animate-spin text-accent" aria-hidden="true" />
+              <p className="mt-3 font-medium text-slate-700 dark:text-slate-200">Waking up the free server…</p>
+              <p className="mt-1">
+                It goes to sleep when nobody has used it for a while, and the first visit after that can take a minute
+                or two. This page keeps trying by itself.
+              </p>
+            </div>
+          ) : (
+            "Loading the model…"
+          )}
+        </div>
       )}
       <Footer />
     </div>
