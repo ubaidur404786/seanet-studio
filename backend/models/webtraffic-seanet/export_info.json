@@ -1,29 +1,7 @@
 {
   "exported": "2026-10-13 12:08:27",
-  "source_bundle": "results/top_results/SEA_NET/top_bottleneck_topk__sea_mstcn_sep_bottleneck__sea_topk_conjunctive/deploy/WebTraffic__seed0.pt",
-  "model_id": "top_bottleneck_topk__sea_mstcn_sep_bottleneck__sea_topk_conjunctive",
   "dataset": "WebTraffic",
   "seed": 0,
-  "encoder": {
-    "type": "sea_mstcn_sep_bottleneck",
-    "d": 64,
-    "n_blocks": 4,
-    "dropout": 0.2,
-    "max_dilation": 16,
-    "kernels": [
-      5,
-      11,
-      23
-    ],
-    "bottleneck_ratio": 4
-  },
-  "pooling": {
-    "type": "sea_topk_conjunctive",
-    "d_attn": 8,
-    "dropout": 0.2,
-    "positional_encoding": true,
-    "top_frac": 0.1
-  },
   "input_length": 1008,
   "n_channels": 1,
   "n_classes": 10,
@@ -41,7 +19,6 @@
     "python": "3.10.20",
     "platform": "Linux-6.12.101+deb13-amd64-x86_64-with-glibc2.41"
   },
-  "trained_git_commit": "c79ef6e9edcb9b9b4eadb71853095e0bc46c7a10",
   "onnx": {
     "file": "model.onnx",
     "opset": 17,

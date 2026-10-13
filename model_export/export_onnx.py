@@ -15,12 +15,13 @@ What it writes into --out-dir:
     manifest.json       (only with --manifest) a copy of the domain card: names, colours, units
     model.onnx          the network: input "series" (batch, 1, T) -> "bag_logits" (batch, C)
                         and "interpretation" (batch, C, T)
-    export_info.json    where the model came from + its test metrics + a check that ONNX gives the
-                        same numbers as PyTorch
+    export_info.json    the dataset, size and test metrics + a check that ONNX gives the same
+                        numbers as PyTorch. on purpose it does NOT save the inner design of the
+                        model or paths into the research repo, because this repo is public
 
-Run it (from the seanet-studio folder):
+Run it (from the seanet-studio folder, needs the private research repo next to it):
     python model_export/export_onnx.py --seanet-repo "../SEA_NET" \
-        --bundle "results/top_results/SEA_NET/top_bottleneck_topk__sea_mstcn_sep_bottleneck__sea_topk_conjunctive/deploy/WebTraffic__seed0.pt" \
+        --bundle "<path to the deploy bundle>/WebTraffic__seed0.pt" \
         --out-dir backend/models/webtraffic-seanet
 """
 import argparse
@@ -69,8 +70,8 @@ def main():
     torch.onnx.export(
         wrapper, example, onnx_path,
         input_names=["series"], output_names=["bag_logits", "interpretation"],
-        # only the batch axis can change. T is fixed because the top-k head computes
-        # k = ceil(top_frac * T) in plain python, so it gets frozen into the graph
+        # only the batch axis can change. the length T gets frozen into the graph during the
+        # export, so every input must have exactly T values (the backend makes sure of that)
         dynamic_axes={"series": {0: "batch"}, "bag_logits": {0: "batch"}, "interpretation": {0: "batch"}},
         opset_version=args.opset,
     )
@@ -91,7 +92,8 @@ def main():
     if diff_logits > 1e-3 or not same_argmax:
         raise SystemExit("ONNX output does not match PyTorch - not saving export_info.json")
 
-    # ---- export_info.json: where this model came from ---------------------------------------
+    # ---- export_info.json: the public facts about this model --------------------------------
+    # (no layer settings, no bundle path, no git commit - the design stays private)
     meta_path = bundle_path.replace(".pt", "_meta.json")
     meta = {}
     if os.path.exists(meta_path):
@@ -100,19 +102,14 @@ def main():
 
     info = {
         "exported": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "source_bundle": args.bundle.replace("\\", "/"),
-        "model_id": payload.get("model_id"),
         "dataset": payload.get("dataset"),
         "seed": payload.get("seed"),
-        "encoder": meta.get("encoder") or payload.get("encoder"),
-        "pooling": meta.get("pooling") or payload.get("pooling"),
         "input_length": T,
         "n_channels": n_in,
         "n_classes": int(payload["n_classes"]),
         "params": meta.get("params"),
         "metrics": meta.get("metrics", {}),
         "trained_with": meta.get("versions", {}),
-        "trained_git_commit": meta.get("git_commit"),
         "onnx": {"file": "model.onnx", "opset": args.opset,
                  "size_kb": round(os.path.getsize(onnx_path) / 1024, 1),
                  "max_abs_diff_logits": diff_logits, "max_abs_diff_interpretation": diff_interp,

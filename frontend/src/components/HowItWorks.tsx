@@ -15,7 +15,7 @@ function Rows({ rows }: { rows: [string, string][] }) {
       {rows.map(([k, v]) => (
         <div key={k} className="flex justify-between gap-4 py-1.5">
           <dt className="shrink-0 text-slate-500">{k}</dt>
-          {/* break-all: long names like sea_mstcn_sep_bottleneck must wrap on a phone */}
+          {/* break-all: long values like the engine version must wrap on a phone */}
           <dd className="num min-w-0 break-all text-right font-mono text-xs text-slate-800 sm:text-sm dark:text-slate-200">{v}</dd>
         </div>
       ))}
@@ -35,13 +35,13 @@ export default function HowItWorks({ model, result }: { model: ModelCard; result
     },
     {
       icon: Layers,
-      title: "2. Encode",
-      text: "A small convolution network looks at short, medium and long patterns around every single time step.",
+      title: "2. Run the model",
+      text: "The trained SEA-Net file reads the whole window in one go, on a normal CPU, in milliseconds.",
     },
     {
       icon: BrainCircuit,
       title: "3. Decide and point",
-      text: "Each time step gets a score for each class. The answer is the average of the strongest 10% of steps, so the shaded parts are really what decided it.",
+      text: "Each time step gets a score for each class, and the answer is built from those scores. So the shaded parts are really what decided it.",
     },
     {
       icon: MessageSquareText,
@@ -51,8 +51,6 @@ export default function HowItWorks({ model, result }: { model: ModelCard; result
   ];
 
   const modelRows: [string, string][] = [
-    ["Encoder", stats.encoder ?? "-"],
-    ["Pooling head", stats.pooling ?? "-"],
     ["Weights", stats.params != null ? `${compact(stats.params)} (${stats.params.toLocaleString()})` : "-"],
     ["Model file", stats.onnx_size_kb != null ? `ONNX, ${(stats.onnx_size_kb / 1024).toFixed(1)} MB` : "-"],
     ["Input shape", runtime.input_shape.join(" × ")],

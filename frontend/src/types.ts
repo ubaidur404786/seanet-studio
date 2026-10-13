@@ -73,8 +73,6 @@ export interface ModelCard {
     ndcg: number | null;
     params: number | null;
     onnx_size_kb: number | null;
-    encoder: string | null;
-    pooling: string | null;
   };
   // the whole test split, run again through the onnx file (model_export/check_test_set.py)
   test_check: {

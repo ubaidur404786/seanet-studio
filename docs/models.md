@@ -3,8 +3,9 @@
 [← back to the README](../README.md)
 
 The app holds **only the final trained models**, ready for inference. Every model is the same
-SEA-Net design (`top_bottleneck_topk`, seed 0, ~41 K weights), trained in the research repo on one
-dataset each. Domains were picked because they are useful in real life **and** SEA-Net does well on them.
+SEA-Net design (~41 K weights), trained on one dataset each. Training happens in a private research
+repo, so this repo has no training code and no model internals. Domains were picked because they
+are useful in real life **and** SEA-Net does well on them.
 
 The numbers below are the **shipped** models, measured again on the full test split through the
 app's own ONNX file and preprocessing (`model_export/check_test_set.py`). All four give exactly the
@@ -33,29 +34,12 @@ Each model folder in `backend/models/<id>/` has `model.onnx`, `export_info.json`
 The domain cards live in `model_export/manifests/`. A domain shows up in the app as soon as its
 folder exists - no code change.
 
-## Adding a domain model
+## Adding a domain
 
-Nothing is trained in this repo. Train in the research repo (with `output.save_deploy: always`
-in `configs/main.yaml`, so the deploy bundle is saved for UCR datasets too), write a manifest in
-`model_export/manifests/`, then export, check and pick samples (example: ECG5000):
-
-```bash
-# in SEA_NET (GPU recommended)
-python main.py single ECG5000 --model top/top_bottleneck_topk
-
-# in seanet-studio
-python model_export/export_onnx.py --seanet-repo ../SEA_NET --bundle results/top_results/SEA_NET/top_bottleneck_topk__sea_mstcn_sep_bottleneck__sea_topk_conjunctive/deploy/ECG5000__seed0.pt --manifest model_export/manifests/ecg5000-seanet.json --out-dir backend/models/ecg5000-seanet
-python model_export/check_test_set.py ucr --dataset ECG5000 --data-dir ../SEA_NET/data/UCR/ECG5000 --model-dir backend/models/ecg5000-seanet
-python model_export/make_samples.py ucr --dataset ECG5000 --data-dir ../SEA_NET/data/UCR/ECG5000 --out-dir backend/models/ecg5000-seanet --signal ecg --one-class 1 --long-classes 0 1 0 2 --item beat beats
-```
-
-The other shipped models used:
-
-| Model | make_samples.py options |
-|---|---|
-| WebTraffic | `webtraffic --interval-min 10 --signal visits --long-classes 0 5 0 9 --item week weeks` |
-| Wafer | `ucr --dataset Wafer --signal sensor --one-class 0 --long-classes 1 1 0 1 --item run runs` |
-| PowerCons | `ucr --dataset PowerCons --signal power --interval-min 10 --one-class 1 --long-classes 0 0 1 1 --item day days` |
+A new domain is a new model folder, not new app code. In short: a trained model is exported to
+ONNX (the export checks that ONNX gives the same answers as PyTorch), checked again on its full
+test set, and given a few real test examples and a manifest. Training and export need the private
+research code, so they are not part of this repo.
 
 The manifest fields that shape the UI: `domain.template` (see
 [domain templates](how-it-works.md#domain-templates)), `domain.item` (what one input is called:
@@ -71,8 +55,7 @@ The manifest fields that shape the UI: `domain.template` (see
   beat types (see the table above). It is a demo, **not a medical device**.
 - Wafer and PowerCons each come from one production line / one household.
 - Series of another length are resampled, which can blur very short events.
-- Every shipped model is one training seed. Over 3 seeds the research repo reports 0.931 ± 0.040
-  WebTraffic accuracy for this architecture; on the 128-dataset UCR archive MILLET is still ahead,
-  and on WebTraffic MILLET does better on the deletion test (AOPCR).
+- Every shipped model comes from one training run, so another run could give slightly different
+  numbers. On WebTraffic, MILLET does better on the deletion test (AOPCR).
 - The written explanation is produced by an LLM from the model's facts. It can still word things
   badly or add its own reasons; the chart is the ground truth.

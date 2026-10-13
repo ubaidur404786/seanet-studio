@@ -81,7 +81,7 @@ numbers and how to add a domain: [docs/models.md](docs/models.md).
 
 | Layer | Tools |
 |---|---|
-| Model | PyTorch (training, in the research repo) → ONNX (opset 17) |
+| Model | PyTorch (training, in a private research repo) → ONNX (opset 17) |
 | Inference | ONNX Runtime, NumPy |
 | API | FastAPI, Pydantic, httpx (async LLM calls), GZip, per-visitor rate limit |
 | LLM | any OpenAI-compatible free API: Groq (default, `openai/gpt-oss-120b`), Google Gemini, or a local Ollama |
@@ -128,6 +128,7 @@ Full list: [docs/models.md#limits](docs/models.md#limits).
 - MILLET and the WebTraffic dataset: Early et al., *Inherently Interpretable Time Series
   Classification via Multiple Instance Learning*, ICLR 2024 -
   [JAEarly/MILTimeSeriesClassification](https://github.com/JAEarly/MILTimeSeriesClassification) (Apache 2.0).
-- SEA-Net model and training: [ubaidur404786/sea-net](https://github.com/ubaidur404786/sea-net).
+- SEA-Net model and training: the research code and the model design are private for now
+  (research in progress); this repo only runs the trained, exported models.
 
 License: Apache 2.0.

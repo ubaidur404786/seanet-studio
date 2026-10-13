@@ -30,7 +30,7 @@
   <text x="64" y="118" class="lane" fill="#3730a3" style="fill:#3730a3">TRAIN &amp; EXPORT <tspan class="when" style="fill:#6366f1">· once, offline</tspan></text>
 
   <rect x="40" y="136" width="262" height="100" rx="10" class="box"/>
-  <text x="56" y="166" class="t">Research repo (SEA_NET)</text>
+  <text x="56" y="166" class="t">Private research repo</text>
   <text x="56" y="191" class="l">train SEA-Net with PyTorch</text>
   <text x="56" y="212" class="l">one model per domain, 41K weights</text>
 

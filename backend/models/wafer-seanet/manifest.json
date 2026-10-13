@@ -33,8 +33,8 @@
      "description": "The sensor reading looks like a good, normal run."}
   ],
   "model_card": {
-    "architecture": "The same SEA-Net design as the other domains (sea_mstcn_sep_bottleneck + sea_topk_conjunctive), trained only on Wafer.",
-    "how_it_explains": "The model gives every time step a score for each class. The final score of a class is the average of its strongest 10% of time steps. Those per-step scores are what you see shaded on the chart.",
+    "architecture": "The same SEA-Net design as the other domains, trained only on Wafer.",
+    "how_it_explains": "The model gives every time step a score for each class, and its answer is built from those scores. Those per-step scores are what you see shaded on the chart.",
     "baseline": "MILLET (Early et al., ICLR 2024), published result on Wafer: 99.8% test accuracy.",
     "limitations": [
       "Trained on one sensor from one production line. Other machines or sensors will need their own model.",

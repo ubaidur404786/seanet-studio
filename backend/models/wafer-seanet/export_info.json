@@ -1,29 +1,7 @@
 {
   "exported": "2026-10-13 15:12:03",
-  "source_bundle": "results/top_results/SEA_NET/top_bottleneck_topk__sea_mstcn_sep_bottleneck__sea_topk_conjunctive/deploy/Wafer__seed0.pt",
-  "model_id": "top_bottleneck_topk__sea_mstcn_sep_bottleneck__sea_topk_conjunctive",
   "dataset": "Wafer",
   "seed": 0,
-  "encoder": {
-    "type": "sea_mstcn_sep_bottleneck",
-    "d": 64,
-    "n_blocks": 4,
-    "dropout": 0.2,
-    "max_dilation": 16,
-    "kernels": [
-      5,
-      11,
-      23
-    ],
-    "bottleneck_ratio": 4
-  },
-  "pooling": {
-    "type": "sea_topk_conjunctive",
-    "d_attn": 8,
-    "dropout": 0.2,
-    "positional_encoding": true,
-    "top_frac": 0.1
-  },
   "input_length": 152,
   "n_channels": 1,
   "n_classes": 2,
@@ -41,7 +19,6 @@
     "python": "3.12.4",
     "platform": "Windows-11-10.0.26300-SP0"
   },
-  "trained_git_commit": "9b48b6d10a9fef2ff3f4ff35d5baf5f1213f133e",
   "onnx": {
     "file": "model.onnx",
     "opset": 17,

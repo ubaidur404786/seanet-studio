@@ -6,8 +6,8 @@
 
 The project has three parts:
 
-1. **Train & export (once, offline).** SEA-Net is trained in the research repo with PyTorch, then
-   exported to ONNX and checked again on the full test set (see [models.md](models.md)).
+1. **Train & export (once, offline).** SEA-Net is trained in a private research repo with PyTorch,
+   then exported to ONNX and checked again on the full test set (see [models.md](models.md)).
 2. **Use the app (every request).** The browser sends a series to the API; the backend prepares
    it, runs the ONNX model, finds the evidence and asks a free LLM to put the facts into words.
 3. **Ship (every push).** CI tests everything; Render and GitHub Pages then publish the new
@@ -15,8 +15,10 @@ The project has three parts:
 
 ## The model: SEA-Net
 
-SEA-Net is a multiple-instance-learning classifier: a series is a "bag" and each time step is an
-"instance". The explanation is part of the forward pass, not a separate tool added afterwards.
+SEA-Net is a small time-series classifier that is interpretable by design: in one pass it gives the
+class **and** a score for every time step. The explanation is part of the model itself, not a
+separate tool added afterwards. The details of its design are private for now (research in
+progress); this repo only holds the trained, exported model files.
 
 | | SEA-Net (this app) | MILLET (ICLR 2024 baseline) |
 |---|---|---|
@@ -25,11 +27,8 @@ SEA-Net is a multiple-instance-learning classifier: a series is a "bag" and each
 | Parameters | **41 K** | 424 K |
 | Inference here | ~10 ms on CPU (ONNX Runtime) | - |
 
-Architecture: a multi-scale separable temporal-convolution encoder (`sea_mstcn_sep_bottleneck`,
-kernels 5/11/23, dilations up to 16) + a **Top-k Conjunctive** pooling head: every time step gets a
-gated score per class, and the class score is the mean of the strongest 10 %.
-Numbers are seed 0 from the research repo; see [the limits](models.md#limits) before reading too
-much into them.
+Numbers are from one training run; see [the limits](models.md#limits) before reading too much
+into them.
 
 ## One request, step by step
 

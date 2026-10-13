@@ -40,8 +40,8 @@
      "description": "A beat the automatic labelling could not put in one of the other groups."}
   ],
   "model_card": {
-    "architecture": "The same SEA-Net design as the other domains (sea_mstcn_sep_bottleneck + sea_topk_conjunctive), trained only on ECG5000.",
-    "how_it_explains": "The model gives every point of the beat a score for every class. The final score of a class is the average of its strongest 10% of points. Those per-point scores are what you see shaded on the chart.",
+    "architecture": "The same SEA-Net design as the other domains, trained only on ECG5000.",
+    "how_it_explains": "The model gives every point of the beat a score for every class, and its answer is built from those scores. Those per-point scores are what you see shaded on the chart.",
     "baseline": "MILLET (Early et al., ICLR 2024), published result on ECG5000: 94.2% test accuracy.",
     "limitations": [
       "This is a demo, NOT a medical device. Never use it to make decisions about a person's health.",

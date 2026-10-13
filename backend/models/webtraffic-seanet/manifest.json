@@ -49,8 +49,8 @@
      "description": "A smooth dip where traffic is lower than it should be, like a partial outage or lost links."}
   ],
   "model_card": {
-    "architecture": "SEA-Net: a small convolution network that looks at short, medium and long patterns (sea_mstcn_sep_bottleneck), plus a Top-k Conjunctive head (sea_topk_conjunctive).",
-    "how_it_explains": "The model gives every single time step a score for every class. The final score of a class is the average of its strongest 10% of time steps. Those per-step scores are what you see shaded on the chart - they are how the model decides, not something added afterwards.",
+    "architecture": "SEA-Net: a small time-series model that is interpretable by design. The details of its design are private for now (research in progress).",
+    "how_it_explains": "The model gives every single time step a score for every class, and its answer is built from those scores. Those per-step scores are what you see shaded on the chart - they are how the model decides, not something added afterwards.",
     "baseline": "MILLET (Early et al., ICLR 2024) trained on the same data: 91.6% test accuracy with 424K weights. MILLET does better on the deletion test (AOPCR); SEA-Net's evidence lands closer to the real problem (NDCG).",
     "limitations": [
       "Trained only on made-up web-traffic weeks of 1,008 values. Real traffic that looks very different can get a confident but wrong answer.",

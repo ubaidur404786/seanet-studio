@@ -36,7 +36,7 @@ class LoadedModel:
         return self.manifest["classes"][idx]
 
     def public_card(self) -> dict:
-        """What the frontend is allowed to see about this model (no file paths)."""
+        """What the frontend is allowed to see about this model (no file paths, no inner design)."""
         info = self.export_info
         onnx_info = info.get("onnx", {})
         check = info.get("test_check")       # written by model_export/check_test_set.py
@@ -57,8 +57,6 @@ class LoadedModel:
                 "ndcg": info.get("metrics", {}).get("test_ndcg"),
                 "params": info.get("params"),
                 "onnx_size_kb": onnx_info.get("size_kb"),
-                "encoder": (info.get("encoder") or {}).get("type"),
-                "pooling": (info.get("pooling") or {}).get("type"),
             },
             # the full test split, run again through model.onnx (None if that check was not run)
             "test_check": None if not check else {

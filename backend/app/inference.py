@@ -103,7 +103,7 @@ def find_regions(score: np.ndarray, top_frac: float = 0.1, max_regions: int = 5,
     Group the strongest supporting time steps into stretches.
 
     score : one number per time step, > 0 means "this step supports the predicted class".
-    top_frac : look at the same share of steps the model itself averages (top 10%).
+    top_frac : the share of steps we look at (the strongest 10%).
     min_share : stretches with less than this share of the evidence are dropped.
     returns : up to max_regions dicts {start, end, share}, biggest share first.
               share = how much of the total positive evidence sits inside that stretch.
@@ -242,7 +242,6 @@ def predict(model: LoadedModel, values) -> dict:
 
     # ---- step 5: turn raw scores into answers -------------------------------------------
     t0 = time.perf_counter()
-    top_frac = float((info.get("pooling") or {}).get("top_frac", 0.1))
     # time labels only make sense when the timing of the points is kept (not when stretched)
     interval = model.manifest["domain"].get("sampling_interval_minutes") if mode != "resampled" else None
 
@@ -263,7 +262,7 @@ def predict(model: LoadedModel, values) -> dict:
         attr_norm = attr / scale if scale > 0 else attr
 
         regions = []
-        for r in find_regions(attr, top_frac=top_frac):
+        for r in find_regions(attr):
             a, b = r["start"] + offset, r["end"] + offset          # positions in the FULL series
             regions.append({
                 **r, "start": a, "end": b,
