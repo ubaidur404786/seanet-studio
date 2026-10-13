@@ -30,7 +30,7 @@ import HowItWorks from "./components/HowItWorks";
 import EmptyState from "./components/EmptyState";
 import Footer from "./components/Footer";
 
-const TRIES = 36; // 36 tries x 5 s = 3 minutes
+const TRIES = 36; // 36 failed tries x 5 s = at least 3 minutes
 
 export default function App() {
   const { theme, toggleTheme } = useTheme();
@@ -39,7 +39,7 @@ export default function App() {
   const [model, setModel] = useState<ModelCard | null>(null);
   const [samples, setSamples] = useState<SampleRef[]>([]);
   const [bootError, setBootError] = useState<string | null>(null);
-  const [waking, setWaking] = useState(false); // true after the first failed try = server is asleep
+  const [waking, setWaking] = useState(false); // true = the server is slow or failing = it is asleep
 
   const [input, setInput] = useState<SeriesInput | null>(null);
   const [result, setResult] = useState<PredictResult | null>(null);
@@ -53,16 +53,19 @@ export default function App() {
   // its own counter: clicking two windows fast must not show the first window's text last
   const explainSeq = useRef(0);
 
-  // load the model list once. the free server (Hugging Face) sleeps after 2 days without
-  // visitors and needs a minute or two to wake up, so we keep trying every 5 s for ~3 minutes
-  // instead of showing an error straight away
+  // load the model list once. the free server (Render) sleeps after 15 minutes without visitors
+  // and needs about a minute to wake up. while it wakes, a request can fail OR just hang, so:
+  //   - after 3 s without an answer we show "Waking up the free server..."
+  //   - a failed try is repeated every 5 s (36 times) before we show an error
   useEffect(() => {
     let alive = true;
+    const slow = setTimeout(() => setWaking(true), 3000);
     const load = async () => {
       for (let attempt = 1; attempt <= TRIES; attempt++) {
         try {
           const list = await api.models();
           if (!alive) return;
+          clearTimeout(slow);
           setModels(list);
           setModel(list[0] ?? null);
           return;
@@ -80,6 +83,7 @@ export default function App() {
     void load();
     return () => {
       alive = false;
+      clearTimeout(slow);
     };
   }, []);
 
@@ -180,7 +184,7 @@ export default function App() {
           <p className="font-semibold">Could not reach the server</p>
           <p className="mt-2 text-sm text-slate-500">{bootError}</p>
           <p className="mt-4 text-xs text-slate-400">
-            We kept trying for 3 minutes. The free server may be restarting - please refresh the page in a little while.
+            We kept trying for a few minutes. The free server may be restarting - please refresh the page in a little while.
           </p>
         </div>
       </div>

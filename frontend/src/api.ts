@@ -2,7 +2,7 @@
 //   - local dev and Docker: API_URL is empty, so it is the same server ("/api"). during
 //     `npm run dev` vite forwards /api to :8000 (see vite.config.ts)
 //   - GitHub Pages: the page and the api live on different hosts, so the build is made with
-//     VITE_API_URL=https://<hf-user>-seanet-studio.hf.space (see .github/workflows/deploy.yml)
+//     VITE_API_URL=https://seanet-studio.onrender.com (see .github/workflows/deploy.yml)
 import type { Explanation, ModelCard, PredictResult, Sample, SampleRef, StepInfo } from "./types";
 
 // vite puts VITE_* variables into the code at build time. remove a "/" at the end so we never get "//api"

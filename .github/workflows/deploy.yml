@@ -1,45 +1,23 @@
-# deploys the whole product for free. started by hand (Actions tab -> Deploy -> Run workflow),
-# so a half-finished commit never goes live by accident.
-#   1. backend  -> a Hugging Face Space (Docker: the API + the model files)
-#   2. frontend -> GitHub Pages (static files), built so it calls the Space's API
+# publishes the frontend on GitHub Pages (free): https://<owner>.github.io/<repo>/
+# the backend is NOT deployed here - Render builds it by itself from render.yaml.
 #
-# one-time setup in the GitHub repo -> Settings -> Secrets and variables -> Actions:
-#   secret   HF_TOKEN     a Hugging Face token with "write" access
-#   secret   LLM_API_KEY  your free Groq key (optional - without it the app writes template text)
-#   variable HF_SPACE     <your-hf-username>/seanet-studio
-#   variable API_URL      https://<your-hf-username>-seanet-studio.hf.space
-# and Settings -> Pages -> Source = "GitHub Actions"
-name: Deploy
+# runs when a commit on main changes the frontend, or by hand (Actions tab -> Deploy frontend ->
+# Run workflow, or `gh workflow run deploy.yml`), e.g. after changing API_URL.
+#
+# one-time setup in the GitHub repo:
+#   Settings -> Secrets and variables -> Actions -> variable API_URL = the backend address,
+#     e.g. https://seanet-studio.onrender.com
+#   Settings -> Pages -> Source = "GitHub Actions"
+name: Deploy frontend
 
 on:
+  push:
+    branches: [main]
+    paths: ["frontend/**", ".github/workflows/deploy.yml"]
   workflow_dispatch:
 
 jobs:
-  backend:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check the settings
-        run: |
-          if [ -z "${{ vars.HF_SPACE }}" ] || [ -z "${{ vars.API_URL }}" ]; then
-            echo "::error::set the repo variables HF_SPACE and API_URL first (see the top of deploy.yml)"
-            exit 1
-          fi
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
-        with:
-          python-version: "3.11"
-      - run: pip install "huggingface_hub>=0.25"
-      # the github pages site lives on https://<owner>.github.io, so that is the origin we allow
-      - run: >-
-          python deploy/huggingface/push_to_space.py
-          --space "${{ vars.HF_SPACE }}"
-          --allowed-origins "https://${{ github.repository_owner }}.github.io"
-        env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-
-  frontend:
-    needs: backend
+  pages:
     runs-on: ubuntu-latest
     # what GitHub Pages needs: permission to publish, and a token that proves who we are
     permissions:
@@ -49,6 +27,13 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      # without API_URL the page would call github.io/api, which does not exist
+      - name: Check the settings
+        run: |
+          if [ -z "${{ vars.API_URL }}" ]; then
+            echo "::error::set the repo variable API_URL first (see the top of deploy.yml)"
+            exit 1
+          fi
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:

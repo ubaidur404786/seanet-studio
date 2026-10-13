@@ -124,7 +124,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         result = run(model, body.values)
         if body.window >= len(result["windows"]):
             raise HTTPException(422, f"there is no window {body.window}")
-        # behind the Hugging Face proxy the real visitor ip is the first one in X-Forwarded-For
+        # behind the host's proxy (Render) the real visitor ip is the first one in X-Forwarded-For
         visitor = request.headers.get("x-forwarded-for", "").split(",")[0].strip() or \
             (request.client.host if request.client else "unknown")
         t0 = time.perf_counter()

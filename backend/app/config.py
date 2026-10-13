@@ -2,7 +2,7 @@
 app/config.py - every setting the backend reads, in one place.
 
 All settings come from environment variables, so the SAME code runs on my laptop, in Docker and on
-Hugging Face Spaces - only the variables change. Nothing secret (like the LLM key) is ever written
+Render - only the variables change. Nothing secret (like the LLM key) is ever written
 in the code or committed to git.
 
 The LLM part uses the "OpenAI-compatible" chat API. Many free providers speak that same format

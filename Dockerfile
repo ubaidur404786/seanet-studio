@@ -1,5 +1,6 @@
 # one image = the whole product: the React app (built in stage 1) served by the FastAPI backend.
-# runs on any free Docker host. on Hugging Face Spaces it listens on 7860.
+# runs on any Docker host. it listens on $PORT: 7860 by default, Render sets its own (10000).
+# online, the main frontend is on GitHub Pages; the copy inside this image is a backup.
 
 # ---- stage 1: build the frontend into static files ------------------------------------------
 FROM node:22-alpine AS web
@@ -17,7 +18,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     STATIC_DIR=/app/static \
     MODELS_DIR=/app/backend/models
 
-# hugging face runs the container as user 1000, so we create it and run as it everywhere
+# run as a normal user, not root - safer if someone ever breaks into the app
 RUN useradd -m -u 1000 user
 WORKDIR /app
 

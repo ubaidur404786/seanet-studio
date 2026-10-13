@@ -1,0 +1,29 @@
+# render.yaml - the backend on Render's free plan (a "Blueprint": Render reads this file and
+# creates the service from it, so the settings live in git instead of in someone's clicks).
+#
+# Render builds our Dockerfile and runs it. Free plan: 512 MB RAM (we use ~170 MB), it sleeps after
+# 15 minutes without visitors and needs about a minute to wake up again.
+#
+# one-time setup: render.com -> sign in with GitHub -> New -> Blueprint -> pick this repo.
+# Render then asks for the values marked "sync: false" (the LLM key) and deploys.
+services:
+  - type: web
+    name: seanet-studio            # -> https://seanet-studio.onrender.com
+    runtime: docker
+    plan: free
+    region: frankfurt
+    healthCheckPath: /api/health
+    # redeploy by itself when a commit lands on main, but only after the GitHub checks (CI) pass
+    autoDeployTrigger: checksPass
+    # a change to the docs only should not rebuild the server
+    buildFilter:
+      ignoredPaths:
+        - "**/*.md"
+        - docs/**
+    envVars:
+      # the frontend lives on GitHub Pages (another host), so the browser needs our "yes" (CORS)
+      - key: ALLOWED_ORIGINS
+        value: https://ubaidur404786.github.io
+      # the free Groq key. never written here: Render asks for it once and keeps it secret
+      - key: LLM_API_KEY
+        sync: false

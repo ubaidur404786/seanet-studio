@@ -12,7 +12,7 @@ moments that made it decide, and explains the result in plain English.
 ![License](https://img.shields.io/badge/license-Apache--2.0-green)
 
 **Live demo:** https://ubaidur404786.github.io/seanet-studio/
-(free hosting: the first visit after a quiet couple of days takes a minute or two while the server wakes up)
+(free hosting: if nobody used it in the last 15 minutes, the server needs about a minute to wake up)
 
 ![SEA-Net Studio](docs/screenshot.jpg)
 
@@ -93,7 +93,7 @@ a model for another domain is a new folder, not new frontend code.
 | API | FastAPI, Pydantic, httpx (async LLM calls), GZip, per-visitor rate limit |
 | LLM | any OpenAI-compatible free API: Groq (default, `openai/gpt-oss-120b`), Google Gemini, or a local Ollama |
 | Frontend | React 19, TypeScript, Vite, Tailwind CSS 4, Recharts, responsive + dark mode |
-| Ops | Docker (multi-stage), GitHub Actions (CI + deploy), Hugging Face Spaces (backend) + GitHub Pages (frontend), both free |
+| Ops | Docker (multi-stage), GitHub Actions (CI + deploy), Render (backend) + GitHub Pages (frontend), both free |
 
 ## Run it locally
 
@@ -130,36 +130,40 @@ docker build -t seanet-studio .
 docker run -p 7860:7860 -e LLM_API_KEY=your_key seanet-studio   # open http://localhost:7860
 ```
 
-## Deploy for free (GitHub Pages + Hugging Face Spaces)
+## Deploy for free (GitHub Pages + Render)
 
 The product is split over two free hosts:
 
-| Part | Host | What runs there |
-|---|---|---|
-| Frontend | GitHub Pages | the built React files (plain static files) |
-| Backend | Hugging Face Space (Docker, free CPU) | FastAPI + ONNX Runtime + the 4 models. It also serves the app itself, as a backup |
+| Part | Host | What runs there | Set up by |
+|---|---|---|---|
+| Frontend | GitHub Pages | the built React files (plain static files) | `.github/workflows/deploy.yml` |
+| Backend | Render, free web service (Docker, 512 MB) | FastAPI + ONNX Runtime + the 4 models (~170 MB of RAM). It also serves the app itself, as a backup | `render.yaml` |
 
 The two are on different hosts, so two settings connect them: the frontend is built with
-`VITE_API_URL` = the Space address, and the Space gets `ALLOWED_ORIGINS` = the Pages address (CORS,
-otherwise the browser blocks the calls). The LLM key is a Space **secret**, it never reaches the browser.
-One workflow, `.github/workflows/deploy.yml`, does everything: backend first, then frontend.
+`VITE_API_URL` = the Render address, and the backend gets `ALLOWED_ORIGINS` = the Pages address
+(CORS, otherwise the browser blocks the calls). The LLM key is a Render **secret**, it never reaches
+the browser.
 
 One-time setup:
 
-1. Create a free account at huggingface.co and a **write** token (Settings → Access Tokens).
-2. In this GitHub repo: Settings → Secrets and variables → Actions:
-   - secret `HF_TOKEN` = the token
-   - secret `LLM_API_KEY` = your free Groq key (optional: without it the app writes template text)
-   - variable `HF_SPACE` = `<your-hf-username>/seanet-studio`
-   - variable `API_URL` = `https://<your-hf-username>-seanet-studio.hf.space`
-3. Settings → Pages → Source: **GitHub Actions**.
-4. Actions tab → **Deploy** → Run workflow (or `gh workflow run deploy.yml`).
+1. [render.com](https://render.com) → sign in with GitHub → **New → Blueprint** → pick this repo.
+   Render reads `render.yaml`, asks for `LLM_API_KEY` (your free Groq key; leave it empty for the
+   template text) and builds the Docker image (a few minutes).
+2. In this GitHub repo: Settings → Secrets and variables → Actions → variable `API_URL` =
+   the Render address, e.g. `https://seanet-studio.onrender.com`.
+3. Settings → Pages → Source: **GitHub Actions**, then run `gh workflow run deploy.yml`.
 
-The Space needs about 5 minutes to build the first time. If you do not use Groq, also add
-`LLM_BASE_URL` / `LLM_MODEL` as variables in the Space settings.
+After that both parts update by themselves: Render rebuilds the backend when CI passes on `main`,
+and the Pages workflow republishes the frontend when a commit changes `frontend/`.
+If you do not use Groq, add `LLM_BASE_URL` / `LLM_MODEL` in the Render dashboard (Environment).
 
-Free Spaces sleep after 48 hours without visitors. The app then shows "Waking up the free server…"
-and keeps trying by itself for 3 minutes, so the first visitor only has to wait.
+**Why not Hugging Face Spaces?** It was the first plan, but since 2026 a Docker Space on the free
+CPU needs a PRO subscription (creating one fails with `402 Payment Required`); only static Spaces
+stay free.
+
+**Sleeping.** A free Render service sleeps after 15 minutes without visitors and needs about a
+minute to wake up. The app then shows "Waking up the free server…" and keeps trying by itself, so
+the first visitor only has to wait.
 
 ## API
 
@@ -200,8 +204,8 @@ frontend/src/
   components/        Header, Logo, Hero, InputPanel, PipelineBar, ResultLayout, PredictionCard,
                      SeriesChart, EvidenceList, ExplanationCard, HowItWorks
 Dockerfile           node build stage + python runtime stage, one container
-.github/workflows/   CI (tests, build, docker) and a manual deploy (Hugging Face + GitHub Pages)
-deploy/huggingface/  the script that uploads the backend to the Space + the Space's own README
+.github/workflows/   CI (tests, build, docker) and the frontend deploy to GitHub Pages
+render.yaml          the backend on Render (free Docker web service)
 ```
 
 ## The models (one per domain)
