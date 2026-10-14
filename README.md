@@ -5,7 +5,7 @@
 **Lightweight AI. Visible evidence. Clear explanations.**
 
 An interpretable time-series AI you can try in the browser: it labels a signal, highlights the
-moments that made it decide, and explains the result in plain English.
+moments that made it decide, and explains the json result using free llm in plain easy words.
 
 ### [▶ Try the live app](https://ubaidur404786.github.io/seanet-studio/)
 
